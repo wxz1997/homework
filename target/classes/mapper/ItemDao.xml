@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.wxz1997.dao.ItemDao">
+
+    <update id="updateById">
+        UPDATE item
+        SET recevied_id = NULL ,
+            recevied_time = NULL,
+            status = 0
+        WHERE item_id = #{itemId}
+    </update>
+
+    <update id="updateItem">
+        UPDATE item
+        <set>
+            <if test='itemName != null and itemName != "" '>item_name = #{itemName},</if>
+            <if test='introduction != null and introduction != "" '>introduction = #{introduction},</if>
+            <if test='fileName != null and fileName != "" '>file_name = #{fileName}</if>
+        </set>
+        WHERE item_id = #{itemId}
+    </update>
+
+    <delete id="deleteItem">
+        DELETE FROM item WHERE item_id = #{item_id}
+    </delete>
+
+    <!--动态插入-->
+    <insert id="addItem">
+        INSERT INTO item
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            create_id, item_name,
+            <if test='introduction != null and introduction != "" '>
+                introduction,
+            </if>
+            <if test='fileName != null and fileName != "" '>
+                file_name,
+            </if>
+        </trim>
+
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            #{createUser.userId}, #{itemName},
+            <if test='introduction != null and introduction != "" '>
+                #{introduction},
+            </if>
+            <if test='fileName != null and fileName != "" '>
+                #{fileName},
+            </if>
+        </trim>
+
+    </insert>
+
+    <resultMap id="itemResultMap" type="Item">
+        <id property="itemId" column="item_id"/>
+        <result property="itemName" column="item_name"/>
+        <result property="introduction" column="introduction"/>
+        <result property="fileName" column="file_name"/>
+        <result property="createTime" column="create_time"/>
+        <result property="receviedTime" column="recevied_time"/>
+        <association property="createUser" column="create_id" javaType="User" select="cn.wxz1997.dao.UserDao.selectByUserId"/>
+        <association property="receviedUser" column="recevied_id" javaType="User" select="cn.wxz1997.dao.UserDao.selectByUserId"/>
+    </resultMap>
+
+
+    <select id="selectByItemId" resultType="Item">
+        SELECT *
+        FROM item
+        WHERE item_id = #{itemId}
+    </select>
+
+    <update id="addMyItem">
+        UPDATE item
+        SET recevied_id = #{receviedUser.userId},
+        recevied_time = #{receviedTime},
+        status = #{status}
+        WHERE item_id = #{itemId}
+    </update>
+
+    <select id="selectByReceviedId">
+        SELECT * FROM item WHERE recevied_id = #{receviedId}
+    </select>
+
+    <!--测试部分-->
+    <!-- 测试分页动态查询 -->
+    <!--1 先测分页-->
+    <select id="selectByPage" parameterType="Map" resultMap="itemResultMap">
+        select *
+        from item
+        <if test="item != null">
+            <where>
+                <!--模糊查询，拼接时这里要将#换成$-->
+                <if test='item.itemName != null and item.itemName != "" '>
+                    item_name LIKE '%${item.itemName}%'
+                </if>
+                <if test='item.introduction != null and item.introduction != "" '>
+                    and introduction LIKE '%${item.introduction}%'
+                </if>
+                <if test='item.status != null and item.status != "" '>
+                    and status = #{item.status}
+                </if>
+            </where>
+        </if>
+
+        <if test="pageModel != null">
+            limit #{pageModel.firstLimitParam},#{pageModel.pageSize}
+        </if>
+    </select>
+
+    <select id="selectList" parameterType="Map" resultMap="itemResultMap">
+        select *
+        from item
+        WHERE status = 0 and success=0
+        <!--模糊查询，拼接时这里要将#换成$-->
+        <if test='item.itemName != null and item.itemName != "" '>
+            and item_name LIKE '%${item.itemName}%'
+        </if>
+        <if test='item.introduction != null and item.introduction != "" '>
+            and introduction LIKE '%${item.introduction}%'
+        </if>
+
+        <if test="pageModel != null">
+            limit #{pageModel.firstLimitParam},#{pageModel.pageSize}
+        </if>
+    </select>
+
+    <select id="selectAll" parameterType="Map" resultMap="itemResultMap">
+        select *
+        from item
+        <if test="item != null">
+            <where>
+                <!--模糊查询，拼接时这里要将#换成$-->
+                <if test='item.itemName != null and item.itemName != "" '>
+                    item_name LIKE '%${item.itemName}%'
+                </if>
+                <if test='item.introduction != null and item.introduction != "" '>
+                    and introduction LIKE '%${item.introduction}%'
+                </if>
+                <if test='item.status != null and item.status != "" '>
+                    and status = #{item.status}
+                </if>
+            </where>
+        </if>
+
+        <if test="pageModel != null">
+            limit #{pageModel.firstLimitParam},#{pageModel.pageSize}
+        </if>
+    </select>
+
+    <select id="selectMy" parameterType="Map" resultMap="itemResultMap">
+        select *
+        from item
+        WHERE recevied_id = #{userId}
+        <!--模糊查询，拼接时这里要将#换成$-->
+        <if test='item.itemName != null and item.itemName != "" '>
+            and item_name LIKE '%${item.itemName}%'
+        </if>
+        <if test='item.introduction != null and item.introduction != "" '>
+            and introduction LIKE '%${item.introduction}%'
+        </if>
+
+        <if test="pageModel != null">
+            limit #{pageModel.firstLimitParam},#{pageModel.pageSize}
+        </if>
+    </select>
+
+    <!-- 查询记录总数 -->
+    <select id="count" resultType="int" parameterType="Map">
+        select count(*) from item
+        <if test="item != null">
+            <where>
+                <!--模糊查询，拼接时这里要将#换成$-->
+                <if test='item.itemName != null and item.itemName != "" '>
+                    item_name LIKE '%${item.itemName}%'
+                </if>
+                <if test='item.introduction != null and item.introduction != "" '>
+                    and introduction LIKE '%${item.introduction}%'
+                </if>
+
+            </where>
+        </if>
+    </select>
+
+
+</mapper>
