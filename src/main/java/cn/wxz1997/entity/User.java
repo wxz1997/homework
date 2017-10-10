@@ -1,6 +1,9 @@
 package cn.wxz1997.entity;
 
 import org.apache.commons.fileupload.util.LimitedInputStream;
+import org.hibernate.validator.constraints.Email;
+import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.NotBlank;
 
 import java.io.Serializable;
 import java.util.List;

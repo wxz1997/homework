@@ -10,6 +10,7 @@ import cn.wxz1997.util.PageModel;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.DigestUtils;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import java.util.HashMap;
@@ -28,8 +29,18 @@ public class HomeworkServiceImpl  implements HomeworkService{
     @Autowired
     private ItemDao itemDao;
 
+    //用于混淆md5
+    private final String slat = "jfsbjs54543728b*&*65jhdbs[]54";
+    //加密
+    private String getMD5(String seckillId){
+        String base = seckillId + "/" + slat;
+        String md5 = DigestUtils.md5DigestAsHex(base.getBytes());
+        return md5;
+    }
+
     @Override
     public User login(User user) {
+        user.setPassword(getMD5(user.getPassword()));
         User user1 = userDao.selectByUsernameAndPasswork(user);
         return user1;
     }
@@ -60,6 +71,7 @@ public class HomeworkServiceImpl  implements HomeworkService{
 
     @Override
     public void register(User user) {
+        user.setPassword(getMD5(user.getPassword()));
         userDao.addUser(user);
         return;
     }

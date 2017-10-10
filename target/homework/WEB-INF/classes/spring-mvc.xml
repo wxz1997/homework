@@ -40,4 +40,17 @@
         <property name="maxInMemorySize" value="40960" />
     </bean>
 
+    <!-- 定义Spring MVC的拦截器 -->
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <!-- 拦截所有请求-->
+            <mvc:mapping path="/*"/>
+            <!-- 拦截所有请求,不知道为什么要加上后缀才可拦截，而且拦截后不是切换到login,而是切换到user/login-->
+            <mvc:mapping path="/user/*"/>
+            <mvc:mapping path="/item/*"/>
+            <!-- 自定义判断用户权限的拦截类 -->
+            <bean class="cn.wxz1997.interceptor.AuthorizedInterceptor"/>
+        </mvc:interceptor>
+    </mvc:interceptors>
+
 </beans>

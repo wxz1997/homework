@@ -19,6 +19,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.jws.WebParam;
 import javax.mail.Session;
+import javax.persistence.criteria.CriteriaBuilder;
 import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -117,7 +118,12 @@ public class ItemController {
     }
 
     @RequestMapping("/allItem")
-    public ModelAndView allItem(ModelAndView mv, Item item, Integer pageIndex){
+    public ModelAndView allItem(Integer pageIndex, @RequestParam(value="stat", required=false)String stat,Item item, ModelAndView mv){
+        if(stat != null && stat!=""){
+            Integer status = Integer.parseInt(stat);
+            item.setStatus(status);
+        }
+
         // 创建分页对象
         PageModel pageModel = new PageModel();
         // 如果参数pageIndex不为null，设置pageIndex，即显示第几页
@@ -198,6 +204,7 @@ public class ItemController {
     @RequestMapping("/toUpdateItem")
     public String toUpdateItem(Integer id , Model model){
         Item item = homeworkService.selectByItemId(id);
+        System.out.println(item);
         model.addAttribute("item", item);
         return "updateItem";
     }

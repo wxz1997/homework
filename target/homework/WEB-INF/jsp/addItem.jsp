@@ -22,9 +22,6 @@
         <div>
             上传附件：<input type="file" id="file" name="file">
         </div>
-        <div>
-            <input type="submit" value="提交">
-        </div>
 
     </form>
 </body>

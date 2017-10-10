@@ -20,9 +20,9 @@
     <div>
         任务名称：<input type="text" name="itemName" id="itemName">
         简介：<input type="text" name="introduction" id="introduction">
-        状态：<select name="status">
+        状态：<select name="stat">
         <option value="" ></option>
-        <option value="0">未领取</option>
+        <option value="2">未领取</option>
         <option value="1">已领取</option>
     </select>
         <input type="submit" value="查询">
